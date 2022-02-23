@@ -3,13 +3,12 @@ import os
 
 import numpy as np
 import tensorflow as tf
-from tensorflow.keras.callbacks import (LearningRateScheduler, ModelCheckpoint,
-                                        TensorBoard)
+from tensorflow.keras.callbacks import LearningRateScheduler, TensorBoard
 from tensorflow.keras.optimizers import SGD, Adam
 
 from nets.arcface import arcface
 from nets.arcface_training import ArcFaceLoss, get_lr_scheduler
-from utils.callbacks import LFW_callback, LossHistory
+from utils.callbacks import LFW_callback, LossHistory, ModelCheckpoint
 from utils.dataloader import FacenetDataset, LFWDataset
 from utils.utils import get_acc, get_num_classes
 
