@@ -2,10 +2,10 @@ import datetime
 import os
 
 import numpy as np
+import tensorflow as tf
 from tensorflow.keras.callbacks import (LearningRateScheduler, ModelCheckpoint,
                                         TensorBoard)
 from tensorflow.keras.optimizers import SGD, Adam
-from tensorflow.keras.regularizers import l2
 
 from nets.arcface import arcface
 from nets.arcface_training import ArcFaceLoss, get_lr_scheduler
@@ -13,6 +13,10 @@ from utils.callbacks import LFW_callback, LossHistory
 from utils.dataloader import FacenetDataset, LFWDataset
 from utils.utils import get_acc, get_num_classes
 
+gpus = tf.config.experimental.list_physical_devices(device_type='GPU')
+for gpu in gpus:
+    tf.config.experimental.set_memory_growth(gpu, True)
+    
 if __name__ == "__main__":
     #--------------------------------------------------------#
     #   指向根目录下的cls_train.txt，读取人脸路径与标签

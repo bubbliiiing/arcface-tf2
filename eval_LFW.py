@@ -1,6 +1,12 @@
+import tensorflow as tf
+
 from nets.arcface import arcface
 from utils.dataloader import LFWDataset
 from utils.utils_metrics import test
+
+gpus = tf.config.experimental.list_physical_devices(device_type='GPU')
+for gpu in gpus:
+    tf.config.experimental.set_memory_growth(gpu, True)
 
 if __name__ == "__main__":
     #--------------------------------------#
@@ -9,7 +15,7 @@ if __name__ == "__main__":
     #   mobilenetv1
     #   iresnet50
     #--------------------------------------#
-    backbone        = "mobilenetv1"
+    backbone        = "mobilefacenet"
     #--------------------------------------#
     #   输入图像大小
     #--------------------------------------#
@@ -17,7 +23,7 @@ if __name__ == "__main__":
     #--------------------------------------#
     #   训练好的权值文件
     #--------------------------------------#
-    model_path      = "model_data/arcface_mobilenet_v1.h5"
+    model_path      = "model_data/arcface_mobilefacenet.h5"
     #--------------------------------------#
     #   LFW评估数据集的文件路径
     #   以及对应的txt文件

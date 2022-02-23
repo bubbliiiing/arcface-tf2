@@ -1,7 +1,12 @@
+import tensorflow as tf
 from PIL import Image
 
 from arcface import Arcface
 
+gpus = tf.config.experimental.list_physical_devices(device_type='GPU')
+for gpu in gpus:
+    tf.config.experimental.set_memory_growth(gpu, True)
+    
 if __name__ == "__main__":
     model = Arcface()
         
