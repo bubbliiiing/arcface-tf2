@@ -16,7 +16,7 @@ def identity_block(input_tensor, kernel_size, filters, stage, block, weight_deca
     #   减少通道数
     #----------------------------#
     x = Conv2D(filters1, kernel_size, padding='same', use_bias=False, name=conv_name_base + '2a',
-               kernel_initializer=initializers.RandomUniform(minval=-0.1, maxval=0.1),
+               kernel_initializer=initializers.RandomNormal(stddev=0.1),
                kernel_regularizer=l2(weight_decay),
                bias_initializer='zeros')(x)
     x = BatchNormalization(name=bn_name_base + '2a', epsilon=1e-5)(x)
@@ -26,7 +26,7 @@ def identity_block(input_tensor, kernel_size, filters, stage, block, weight_deca
     #   3x3卷积
     #----------------------------#
     x = Conv2D(filters2, kernel_size, padding='same', use_bias=False, name=conv_name_base + '2b',
-               kernel_initializer=initializers.RandomUniform(minval=-0.1, maxval=0.1),
+               kernel_initializer=initializers.RandomNormal(stddev=0.1),
                kernel_regularizer=l2(weight_decay),
                bias_initializer='zeros')(x)
     x = BatchNormalization(name=bn_name_base + '2b', epsilon=1e-5)(x)
@@ -47,7 +47,7 @@ def conv_block(input_tensor, kernel_size, filters, stage, block, strides=(2, 2),
     #   减少通道数
     #----------------------------#
     x = Conv2D(filters1, kernel_size, padding='same', use_bias=False, name=conv_name_base + '2a',
-               kernel_initializer=initializers.RandomUniform(minval=-0.1, maxval=0.1),
+               kernel_initializer=initializers.RandomNormal(stddev=0.1),
                kernel_regularizer=l2(weight_decay),
                bias_initializer='zeros')(x)
     x = BatchNormalization(name=bn_name_base + '2a', epsilon=1e-5)(x)
@@ -57,7 +57,7 @@ def conv_block(input_tensor, kernel_size, filters, stage, block, strides=(2, 2),
     #   3x3卷积
     #----------------------------#
     x = Conv2D(filters2, kernel_size, padding='same', use_bias=False, strides=strides, name=conv_name_base + '2b',
-               kernel_initializer=initializers.RandomUniform(minval=-0.1, maxval=0.1),
+               kernel_initializer=initializers.RandomNormal(stddev=0.1),
                kernel_regularizer=l2(weight_decay),
                bias_initializer='zeros')(x)
     x = BatchNormalization(name=bn_name_base + '2b', epsilon=1e-5)(x)
@@ -66,7 +66,7 @@ def conv_block(input_tensor, kernel_size, filters, stage, block, strides=(2, 2),
     #   残差边
     #----------------------------#
     shortcut = Conv2D(filters2, (1, 1), strides=strides, use_bias=False, name=conv_name_base + '1',
-               kernel_initializer=initializers.RandomUniform(minval=-0.1, maxval=0.1),
+               kernel_initializer=initializers.RandomNormal(stddev=0.1),
                kernel_regularizer=l2(weight_decay),
                bias_initializer='zeros')(input_tensor)
     shortcut = BatchNormalization(name=bn_name_base + '1', epsilon=1e-5)(shortcut)
@@ -77,7 +77,7 @@ def conv_block(input_tensor, kernel_size, filters, stage, block, strides=(2, 2),
 def iResNet50(inputs, embedding_size, dropout_keep_prob=0.5, weight_decay=5e-4):
     x = ZeroPadding2D((1, 1))(inputs)
     x = Conv2D(64, (3, 3), strides=(1, 1), name='conv1', use_bias=False,
-                kernel_initializer=initializers.RandomUniform(minval=-0.1, maxval=0.1),
+                kernel_initializer=initializers.RandomNormal(stddev=0.1),
                 kernel_regularizer=l2(weight_decay),
                 bias_initializer='zeros')(x)
     x = BatchNormalization(name='bn_conv1', epsilon=1e-5)(x)
@@ -117,7 +117,7 @@ def iResNet50(inputs, embedding_size, dropout_keep_prob=0.5, weight_decay=5e-4):
     x = Dropout(dropout_keep_prob)(x)
     x = Flatten()(x)
     x = Dense(embedding_size, name='linear',
-            kernel_initializer=initializers.RandomUniform(minval=-0.1, maxval=0.1),
+            kernel_initializer=initializers.RandomNormal(stddev=0.1),
             kernel_regularizer=l2(weight_decay),
             bias_initializer='zeros')(x)
     x = BatchNormalization(name='features', epsilon=1e-5,)(x)

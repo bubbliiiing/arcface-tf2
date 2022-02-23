@@ -7,7 +7,7 @@ from tensorflow.keras.regularizers import l2
 
 def conv_block(inputs, filters, kernel_size, strides, padding, weight_decay=5e-4):
     x = Conv2D(filters, kernel_size, strides=strides, padding=padding, use_bias=False, 
-               kernel_initializer=initializers.RandomUniform(minval=-0.1, maxval=0.1),
+               kernel_initializer=initializers.RandomNormal(stddev=0.1),
                kernel_regularizer=l2(weight_decay),
                bias_initializer='zeros')(inputs)
     x = BatchNormalization(axis=-1, epsilon=1e-5)(x)
@@ -16,7 +16,7 @@ def conv_block(inputs, filters, kernel_size, strides, padding, weight_decay=5e-4
 
 def depthwise_conv_block(inputs, filters, kernel_size, strides, weight_decay=5e-4):
     x = DepthwiseConv2D(kernel_size, strides=strides, padding="same", use_bias=False,
-                        depthwise_initializer=initializers.RandomUniform(minval=-0.1, maxval=0.1),
+                        depthwise_initializer=initializers.RandomNormal(stddev=0.1),
                         depthwise_regularizer=l2(weight_decay), 
                         bias_initializer='zeros')(inputs)
     x = BatchNormalization(axis=-1, epsilon=1e-5)(x)
@@ -28,14 +28,14 @@ def bottleneck(inputs, filters, kernel, t, strides, r=False, weight_decay=5e-4):
     x = conv_block(inputs, tchannel, 1, 1, "same")
 
     x = DepthwiseConv2D(kernel, strides=strides, padding="same", depth_multiplier=1, use_bias=False,
-                        depthwise_initializer=initializers.RandomUniform(minval=-0.1, maxval=0.1),
+                        depthwise_initializer=initializers.RandomNormal(stddev=0.1),
                         depthwise_regularizer=l2(weight_decay), 
                         bias_initializer='zeros')(x)
     x = BatchNormalization(axis=-1, epsilon=1e-5)(x)
     x = PReLU(alpha_initializer=initializers.constant(0.25), alpha_regularizer=l2(weight_decay), shared_axes=[1, 2])(x)
     
     x = Conv2D(filters, 1, strides=1, padding="same", use_bias=False, 
-               kernel_initializer=initializers.RandomUniform(minval=-0.1, maxval=0.1),
+               kernel_initializer=initializers.RandomNormal(stddev=0.1),
                kernel_regularizer=l2(weight_decay),
                bias_initializer='zeros')(x)
     x = BatchNormalization(axis=-1, epsilon=1e-5)(x)
@@ -63,20 +63,20 @@ def mobilefacenet(inputs, embedding_size, weight_decay=5e-4):
     x = inverted_residual_block(x, 128, 3, t=2, n=2, weight_decay=weight_decay)  # (7, 7, 128)
     
     x = Conv2D(512, 1, use_bias=False,
-               kernel_initializer=initializers.RandomUniform(minval=-0.1, maxval=0.1),
+               kernel_initializer=initializers.RandomNormal(stddev=0.1),
                kernel_regularizer=l2(weight_decay),
                bias_initializer='zeros')(x)
     x = BatchNormalization(epsilon=1e-5)(x)
     x = PReLU(alpha_initializer=initializers.constant(0.25), alpha_regularizer=l2(weight_decay), shared_axes=[1, 2])(x)
     
     x = DepthwiseConv2D(int(x.shape[1]), depth_multiplier=1, use_bias=False,
-                        depthwise_initializer=initializers.RandomUniform(minval=-0.1, maxval=0.1),
+                        depthwise_initializer=initializers.RandomNormal(stddev=0.1),
                         depthwise_regularizer=l2(weight_decay), 
                         bias_initializer='zeros')(x)
     x = BatchNormalization(epsilon=1e-5)(x)
-
+    
     x = Conv2D(embedding_size, 1, use_bias=False,
-               kernel_initializer=initializers.RandomUniform(minval=-0.1, maxval=0.1),
+               kernel_initializer=initializers.RandomNormal(stddev=0.1),
                kernel_regularizer=l2(weight_decay),
                bias_initializer='zeros')(x)
     x = BatchNormalization(name="embedding", epsilon=1e-5)(x)

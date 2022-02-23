@@ -13,7 +13,7 @@ def _conv_block(inputs, filters, kernel=(3, 3), strides=(1, 1), weight_decay=5e-
                use_bias=False,
                strides=strides,
                name='conv1',
-               kernel_initializer=initializers.RandomUniform(minval=-0.1, maxval=0.1),
+               kernel_initializer=initializers.RandomNormal(stddev=0.1),
                kernel_regularizer=l2(weight_decay),
                bias_initializer='zeros')(inputs)
     x = BatchNormalization(name='conv1_bn', epsilon=1e-5)(x)
@@ -28,7 +28,7 @@ def _depthwise_conv_block(inputs, pointwise_conv_filters,
                         strides=strides,
                         use_bias=False,
                         name='conv_dw_%d' % block_id,
-                        depthwise_initializer=initializers.RandomUniform(minval=-0.1, maxval=0.1),
+                        depthwise_initializer=initializers.RandomNormal(stddev=0.1),
                         depthwise_regularizer=l2(weight_decay), 
                         bias_initializer='zeros')(inputs)
 
@@ -40,7 +40,7 @@ def _depthwise_conv_block(inputs, pointwise_conv_filters,
                use_bias=False,
                strides=(1, 1),
                name='conv_pw_%d' % block_id,
-               kernel_initializer=initializers.RandomUniform(minval=-0.1, maxval=0.1),
+               kernel_initializer=initializers.RandomNormal(stddev=0.1),
                kernel_regularizer=l2(weight_decay),
                bias_initializer='zeros')(x)
     x = BatchNormalization(name='conv_pw_%d_bn' % block_id, epsilon=1e-5)(x)
@@ -70,7 +70,7 @@ def MobilenetV1(inputs, embedding_size, dropout_keep_prob=0.5, depth_multiplier=
     x = _depthwise_conv_block(x, 1024, depth_multiplier, block_id=13, weight_decay=weight_decay)
 
     x = Conv2D(512, kernel_size=1, use_bias=False, name='sep',
-               kernel_initializer=initializers.RandomUniform(minval=-0.1, maxval=0.1),
+               kernel_initializer=initializers.RandomNormal(stddev=0.1),
                kernel_regularizer=l2(weight_decay),
                bias_initializer='zeros')(x)
     x = BatchNormalization(name='sep_bn', epsilon=1e-5)(x)
@@ -80,7 +80,7 @@ def MobilenetV1(inputs, embedding_size, dropout_keep_prob=0.5, depth_multiplier=
     x = Dropout(dropout_keep_prob)(x)
     x = Flatten()(x)
     x = Dense(embedding_size, name='linear',
-            kernel_initializer=initializers.RandomUniform(minval=-0.1, maxval=0.1),
+            kernel_initializer=initializers.RandomNormal(stddev=0.1),
             kernel_regularizer=l2(weight_decay),
             bias_initializer='zeros')(x)
     x = BatchNormalization(name='features', epsilon=1e-5)(x)

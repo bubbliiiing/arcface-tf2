@@ -32,7 +32,7 @@ class ArcMarginProduct(Layer) :
     def compute_output_shape(self, input_shape) :
         return (None, self.n_classes)
 
-def arcface(input_shape, num_classes=None, backbone="mobilefacenet", mode="train", weight_decay=5e-4):
+def arcface(input_shape, num_classes=10575, backbone="mobilefacenet", mode="train", weight_decay=5e-4):
     inputs = Input(shape=input_shape)
 
     if backbone=="mobilefacenet":
