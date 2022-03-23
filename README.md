@@ -2,13 +2,24 @@
 ---
 
 ## 目录
-1. [性能情况 Performance](#性能情况)
-2. [所需环境 Environment](#所需环境)
-3. [注意事项 Attention](#注意事项)
-4. [文件下载 Download](#文件下载)
-5. [预测步骤 How2predict](#预测步骤)
-6. [训练步骤 How2train](#训练步骤)
-7. [参考资料 Reference](#Reference)
+1. [仓库更新 Top News](#仓库更新)
+2. [相关仓库 Related code](#相关仓库)
+3. [性能情况 Performance](#性能情况)
+4. [所需环境 Environment](#所需环境)
+5. [注意事项 Attention](#注意事项)
+6. [文件下载 Download](#文件下载)
+7. [预测步骤 How2predict](#预测步骤)
+8. [训练步骤 How2train](#训练步骤)
+9. [参考资料 Reference](#Reference)
+
+## Top News
+**`2022-03`**:**创建仓库，支持不同模型训练,支持大量可调整参数，支持step、cos学习率下降法、支持adam、sgd优化器选择、支持学习率根据batch_size自适应调整、新增图片裁剪。**  
+
+## 相关仓库
+| 模型 | 路径 |
+| :----- | :----- |
+facenet | https://github.com/bubbliiiing/facenet-tf2
+arcface | https://github.com/bubbliiiing/arcface-tf2
 
 ## 性能情况
 | 训练数据集 | 权值文件名称 | 测试数据集 | 输入图片大小 | accuracy | Validation rate |
@@ -16,7 +27,6 @@
 | CASIA-WebFace | [arcface_mobilenet.h5](https://github.com/bubbliiiing/arcface-tf2/releases/download/v1.0/arcface_mobilenet.h5) | LFW | 112x112 | 99.00% |  0.95200+-0.02237 @ FAR=0.00100 |
 | CASIA-WebFace | [arcface_mobilefacenet.h5](https://github.com/bubbliiiing/arcface-tf2/releases/download/v1.0/arcface_mobilefacenet.h5) | LFW | 112x112 | 99.02% | 0.96500+-0.01344 @ FAR=0.00133 |
 | CASIA-WebFace | [arcface_iresnet50.h5](https://github.com/bubbliiiing/arcface-tf2/releases/download/v1.0/arcface_iresnet50.h5) | LFW | 112x112 | 98.98% | 0.92967+-0.01935 @ FAR=0.00133 |
-
 
 ## 所需环境
 tensorflow==2.2.0
