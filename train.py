@@ -12,11 +12,14 @@ from utils.callbacks import LFW_callback, LossHistory, ModelCheckpoint
 from utils.dataloader import FacenetDataset, LFWDataset
 from utils.utils import get_acc, get_num_classes
 
-gpus = tf.config.experimental.list_physical_devices(device_type='GPU')
-for gpu in gpus:
-    tf.config.experimental.set_memory_growth(gpu, True)
-    
+
 if __name__ == "__main__":
+    #---------------------------------------------------------------------#
+    #   train_gpu   训练用到的GPU
+    #               默认为第一张卡、双卡为[0, 1]、三卡为[0, 1, 2]
+    #               在使用多GPU时，每个卡上的batch为总batch除以卡的数量。
+    #---------------------------------------------------------------------#
+    train_gpu       = [0,]
     #--------------------------------------------------------#
     #   指向根目录下的cls_train.txt，读取人脸路径与标签
     #--------------------------------------------------------#
@@ -120,17 +123,48 @@ if __name__ == "__main__":
     lfw_dir_path    = "lfw"
     lfw_pairs_path  = "model_data/lfw_pair.txt"
 
+    #------------------------------------------------------#
+    #   设置用到的显卡
+    #------------------------------------------------------#
+    os.environ["CUDA_VISIBLE_DEVICES"]  = ','.join(str(x) for x in train_gpu)
+    ngpus_per_node                      = len(train_gpu)
+    
+    gpus = tf.config.experimental.list_physical_devices(device_type='GPU')
+    for gpu in gpus:
+        tf.config.experimental.set_memory_growth(gpu, True)
+        
+    if ngpus_per_node > 1:
+        strategy = tf.distribute.MirroredStrategy()
+    else:
+        strategy = None
+    print('Number of devices: {}'.format(ngpus_per_node))
+
     num_classes = get_num_classes(annotation_path)
-    #-------------------------------------------#
-    #   建立模型
-    #-------------------------------------------#
-    model = arcface(input_shape, num_classes, backbone=backbone, mode="train", weight_decay=weight_decay)
-    if model_path != '':
-        #------------------------------------------------------#
-        #   载入预训练权重
-        #------------------------------------------------------#
-        print('Load weights {}.'.format(model_path))
-        model.load_weights(model_path, by_name=True, skip_mismatch=True)
+    
+    if ngpus_per_node > 1:
+        with strategy.scope():
+            #-------------------------------------------#
+            #   建立模型
+            #-------------------------------------------#
+            model = arcface(input_shape, num_classes, backbone=backbone, mode="train", weight_decay=weight_decay)
+            if model_path != '':
+                #------------------------------------------------------#
+                #   载入预训练权重
+                #------------------------------------------------------#
+                print('Load weights {}.'.format(model_path))
+                model.load_weights(model_path, by_name=True, skip_mismatch=True)
+    else:
+        #-------------------------------------------#
+        #   建立模型
+        #-------------------------------------------#
+        model = arcface(input_shape, num_classes, backbone=backbone, mode="train", weight_decay=weight_decay)
+        if model_path != '':
+            #------------------------------------------------------#
+            #   载入预训练权重
+            #------------------------------------------------------#
+            print('Load weights {}.'.format(model_path))
+            model.load_weights(model_path, by_name=True, skip_mismatch=True)
+
     #-------------------------------------------------------#
     #   0.01用于验证，0.99用于训练
     #-------------------------------------------------------#
@@ -159,7 +193,11 @@ if __name__ == "__main__":
         }[optimizer_type]
         m = 0.5
         s = 32 if backbone == "mobilefacenet" else 64
-        model.compile(optimizer = optimizer, loss={'ArcMargin': ArcFaceLoss(s = s, m = m)}, metrics={'ArcMargin': get_acc()})
+        if ngpus_per_node > 1:
+            with strategy.scope():
+                model.compile(optimizer = optimizer, loss={'ArcMargin': ArcFaceLoss(s = s, m = m)}, metrics={'ArcMargin': get_acc()})
+        else:
+            model.compile(optimizer = optimizer, loss={'ArcMargin': ArcFaceLoss(s = s, m = m)}, metrics={'ArcMargin': get_acc()})
     
         #---------------------------------------#
         #   获得学习率下降的公式
@@ -199,8 +237,8 @@ if __name__ == "__main__":
             callbacks       = [logging, loss_history, checkpoint, lr_scheduler]
 
         print('Train on {} samples, val on {} samples, with batch size {}.'.format(num_train, num_val, batch_size))
-        model.fit_generator(
-            generator           = train_dataset,
+        model.fit(
+            x                   = train_dataset,
             steps_per_epoch     = epoch_step,
             validation_data     = val_dataset,
             validation_steps    = epoch_step_val,
