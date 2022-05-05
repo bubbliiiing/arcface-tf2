@@ -10,8 +10,9 @@ from nets.arcface import arcface
 from nets.arcface_training import ArcFaceLoss, get_lr_scheduler
 from utils.callbacks import LFW_callback, LossHistory, ModelCheckpoint
 from utils.dataloader import FacenetDataset, LFWDataset
-from utils.utils import get_acc, get_num_classes
+from utils.utils import get_acc, get_num_classes, show_config
 
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2' 
 
 if __name__ == "__main__":
     #---------------------------------------------------------------------#
@@ -176,7 +177,14 @@ if __name__ == "__main__":
     np.random.seed(None)
     num_val = int(len(lines)*val_split)
     num_train = len(lines) - num_val
-            
+
+    show_config(
+        num_classes = num_classes, backbone = backbone, model_path = model_path, input_shape = input_shape, \
+        Init_Epoch = Init_Epoch, Epoch = Epoch, batch_size = batch_size, \
+        Init_lr = Init_lr, Min_lr = Min_lr, optimizer_type = optimizer_type, momentum = momentum, lr_decay_type = lr_decay_type, \
+        save_period = save_period, save_dir = save_dir, num_workers = num_workers, num_train = num_train, num_val = num_val
+    )    
+
     if True:
         #-------------------------------------------------------------------#
         #   判断当前batch_size，自适应调整学习率
